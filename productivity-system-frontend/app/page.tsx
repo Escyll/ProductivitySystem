@@ -48,8 +48,8 @@ export default function Home() {
           </div>
           <div className="flex w-200">
             <div className="grow" />
-            <div className="flex justify-center w-12">P</div>
-            <div className="flex justify-center w-12">A</div>
+            <div className="flex justify-center w-14">P</div>
+            <div className="flex justify-center w-14">A</div>
           </div>
           <hr className="h-1 bg-red-600 border-0 dark:bg-gray-600" />
           <div className="divide-y w-200 border-r z-10">
@@ -59,15 +59,17 @@ export default function Home() {
           </div>
           <div className="flex w-200 divide-x border-r z-0">
             <hr className="grow h-1 bg-red-600 border-0 dark:bg-gray-600" />
-            <hr className="w-12 h-1 bg-red-600 border-0 dark:bg-gray-600" />
-            <hr className="w-12 h-1 bg-red-600 border-0 dark:bg-gray-600" />
+            <hr className="w-14 h-1 bg-red-600 border-0 dark:bg-gray-600" />
+            <hr className="w-14 h-1 bg-red-600 border-0 dark:bg-gray-600" />
           </div>
           <div className="flex w-200 divide-x border-r">
             <div className="grow" />
-            <div className="flex justify-center w-12 text-gray-500 font-extralight">
+            <div className="flex justify-center w-14 text-gray-500 text-6xl">
               {possiblePoints}
             </div>
-            <div className="flex justify-center w-12">{actualPoints}</div>
+            <div className="flex justify-center w-14 text-6xl">
+              {actualPoints}
+            </div>
           </div>
           <div className="flex pt-8 justify-center font-bold">
             {possiblePoints > 0
