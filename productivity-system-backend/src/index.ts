@@ -1,7 +1,26 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
+import knex from 'knex'
+import { GraphQLScalarType } from 'graphql';
+
+import { TTSDataSource } from "./TTSDataSource.js";
+import knexConfig from './knexfile.js'
+
+const myknex = knex(knexConfig.development);
+
+const dateScalar = new GraphQLScalarType({
+  name: 'Date',
+  parseValue(value: string) {
+    return new Date(value);
+  },
+  serialize(value: Date) {
+    return value.toISOString();
+  },
+})
 
 const typeDefs = `#graphql
+  scalar Date
+
   enum Status {
     Todo,
     PartiallyDone,
@@ -9,57 +28,50 @@ const typeDefs = `#graphql
   }
 
   type Task {
+    id: Int!
     description: String!
     status: String!
-    dayCards: [DayCard]
+    dayCard: DayCard
   }
 
   type DayCard {
-    day: String!
+    id: Int!
+    day: Date!
     tasks: [Task]!
   }
 
   type Query {
-    tasks: [Task]
-    dayCards: [DayCard]
+    tasks: [Task]!
+    dayCards: [DayCard]!
   }
 `;
-let dayCards;
-const tasks = [
-  {
-    description: "Shower",
-    status: "Todo",
-    dayCards: dayCards,
-  },
-  {
-    description: "Eat",
-    status: "Todo",
-    dayCards: dayCards,
-  },
-];
-
-dayCards = [
-  {
-    day: "Today",
-    tasks: tasks,
-  },
-];
-
-tasks[0].dayCards = dayCards;
-tasks[1].dayCards = dayCards;
 
 // Resolvers define how to fetch the types defined in your schema.
 // This resolver retrieves books from the "books" array above.
 const resolvers = {
+  Date: dateScalar,
   Query: {
-    tasks: () => tasks,
-    dayCards: () => dayCards,
+    tasks: async (_, __, { dataSources }) => await dataSources.ttsDataSource.getTasks(),
+    dayCards: async (_, __, { dataSources }) => await dataSources.ttsDataSource.getDays(),
   },
+  DayCard: {
+    day: async (parent) => parent.date,
+    tasks: async (parent, _, { dataSources }) => await dataSources.ttsDataSource.getDayCardTasks(parent.id),
+  },
+  Task: {
+    dayCard: async(parent, _, { dataSources }) => await dataSources.ttsDataSource.getTaskDayCard(parent.id),
+  }
 };
+
+interface ContextValue {
+  dataSources: {
+    ttsDataSource: TTSDataSource;
+  };
+}
 
 // The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.
-const server = new ApolloServer({
+const server = new ApolloServer<ContextValue>({
   typeDefs,
   resolvers,
 });
@@ -69,7 +81,14 @@ const server = new ApolloServer({
 //  2. installs your ApolloServer instance as middleware
 //  3. prepares your app to handle incoming requests
 const { url } = await startStandaloneServer(server, {
-  listen: { port: 4000 },
+    listen: { port: 4000 },
+    context: async ({req}) => {
+        return {
+            dataSources: {
+                ttsDataSource: new TTSDataSource(myknex)
+            }
+        }
+    }
 });
 
 console.log(`🚀  Server ready at: ${url}`);

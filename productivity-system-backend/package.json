@@ -2,21 +2,30 @@
   "name": "productivity-system-backend",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "compile": "tsc",
-    "start": "npm run compile && node ./dist/index.js"
+    "start": "npm run compile && node ./dist/index.js",
+    "migrate:rollback": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' ./node_modules/.bin/knex migrate:rollback --knexfile src/knexfile.js",
+    "migrate:latest": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' ./node_modules/.bin/knex migrate:latest --knexfile src/knexfile.js",
+    "migrate:make": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' ./node_modules/.bin/knex migrate:make --knexfile src/knexfile.js -x ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
-  "type": "module",
   "dependencies": {
     "@apollo/server": "^4.10.4",
-    "graphql": "^16.8.1"
+    "graphql": "^16.8.1",
+    "knex": "^3.1.0",
+    "pg": "^8.11.5"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
+  },
+  "compilerOptions": {
+    "moduleResolution": "nodeNext"
   }
 }

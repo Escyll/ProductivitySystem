@@ -4,9 +4,12 @@
     "outDir": "dist",
     "lib": ["es2020"],
     "target": "es2020",
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "types": ["node"]
+  },
+  "ts-node": {
+    "esm": true,
   }
 }
